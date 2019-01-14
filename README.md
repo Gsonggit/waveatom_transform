@@ -1,2 +1,2 @@
 # waveatom_transform
-origion waveatom transform transfered to Python
+origin waveatom transform matlab code transfered to Python
