@@ -6,7 +6,7 @@
 #     data —— numpy.ndarray , the origion 1-D signal
 #     pat  —— str  ,  'p' or 'q',specifies the type of frequency partition satsfies parabolic scaling
 #     tp   —— str  ,  'ortho(orthobasis)' or 'comp(complex)',specifies the type of transform
-#
+#  
 #     c    —— list   , c[i][j][k] is cofficient at scale i ,frequency index j,spatial index k
 #
 # Date:2019/1/15 
@@ -17,6 +17,7 @@ import numpy as np
 import math
 
 def wat(data,pat='p',tp='ortho'):
+    # 1-D forward wave atom transform refer to fwa1.m
     if len(data.shape) > 1 or data.shape[0] <= 32 :
         raise TypeError('input data invalid ,please check!')
 
@@ -92,6 +93,7 @@ def wat(data,pat='p',tp='ortho'):
         return c
 
 def iwa(c,pat='p',tp='ortho'):
+    # 1-D inverse wave atom transform refer to iwa1.m
     if tp == 'ortho' or tp == 'orthobasis':
         T=0
         for i in range(len(c)):
@@ -160,6 +162,30 @@ def iwa(c,pat='p',tp='ortho'):
                     f[Idx%N]=f[Idx%N]+Icf*res[Idx%D]  
         x=np.fft.ifft(f)*np.sqrt(len(f))    
         return x.real
+
+def pwa(data,pat='p',tp='ortho'):
+    # 1-D spatial domain and frequency domain information corresponding to wave atom transform refer to pwa1.m
+    # output: s —— a list corresponding to c represents the center of the wave atom in spatial domain
+    #         f —— a list corresponding to c represents the center of the wave atom in frequency domain
+    if tp == 'ortho':
+        lst=freq_partition(len(data)/2,pat)
+        s=[]
+        f=[]
+        for i in range(len(lst)):
+            nw=len(lst[i])
+            s.append([])
+            f.append([])
+            for j in range(nw):
+                if lst[i][j] == 0:
+                    s[i].append([])
+                    f[i].append([])
+                else :
+                    B=2**i
+                    D=2*B
+                    Imd=(j+1/2)*B
+                    s[i].append([x/D for x in range(D)])
+                    f[i].append(list(Imd*np.ones(D)))
+        return s,f
 
 
 def check_length(data):
